@@ -1,0 +1,60 @@
+{
+  "ui_projectName": "HSI_PoC",
+  "ui_settings": {
+    "confirmDelete": true,
+    "showEZSecure": false,
+    "enableValuetypes": false,
+    "autosave": 1,
+    "enforceSnippetSeparation": true,
+    "useAsSnippetIfName": false,
+    "enableValidation": false
+  },
+  "ui_lastSaveTime": "15/4/2024 @ 14:17:09",
+  "ui_creationDate": "22/1/2024 @ 14:18:53",
+  "ui_creationSysDVersion": "7.2.0",
+  "ui_projectNotes": "",
+  "ui_include": [
+    {
+      "path": "BaselineRoot.documentationONLY.xml",
+      "readonly": true,
+      "builtin": true
+    },
+    {
+      "path": "BuiltinProfiles.documentationONLY.xml",
+      "readonly": true,
+      "builtin": true
+    },
+    {
+      "path": "HSI_Standard_topics.xml",
+      "readonly": false,
+      "builtin": false
+    },
+    {
+      "path": "HSI_generic_TcServer.xml",
+      "readonly": false,
+      "builtin": false
+    },
+    {
+      "path": "HSI_generic_Implement.xml",
+      "readonly": false,
+      "builtin": false
+    },
+    {
+      "path": "TUM_Sprayer.xml",
+      "readonly": false,
+      "builtin": false
+    },
+    {
+      "path": "HSI_generic_Tractor.xml",
+      "readonly": false,
+      "builtin": false
+    },
+    {
+      "path": "GNSS_Device.xml",
+      "readonly": false,
+      "builtin": false
+    }
+  ],
+  "ui_scenariopath": null,
+  "ui_projectGUID": "9e7adc2b-1998-25cb-0d64-9ad0a525cba3"
+}

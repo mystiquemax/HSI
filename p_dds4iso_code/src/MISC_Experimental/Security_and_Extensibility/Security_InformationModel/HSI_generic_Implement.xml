@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MIT License -->
+<!--  -->
+<!-- Copyright (c) 2024 Samuel Brodie, Timo Oksanen, Henri Hornburg, Daniel Ostermeier, Maksim Pavlov Technical University of Munich -->
+<!--  -->
+<!-- Permission is hereby granted, free of charge, to any person obtaining a copy -->
+<!-- of this software and associated documentation files (the "Software"), to deal -->
+<!-- in the Software without restriction, including without limitation the rights -->
+<!-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell -->
+<!-- copies of the Software, and to permit persons to whom the Software is -->
+<!-- furnished to do so, subject to the following conditions: -->
+<!--  -->
+<!-- The above copyright notice and this permission notice shall be included in all -->
+<!-- copies or substantial portions of the Software. -->
+<!--  -->
+<!-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR -->
+<!-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, -->
+<!-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE -->
+<!-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER -->
+<!-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, -->
+<!-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE -->
+<!-- SOFTWARE. -->
+
+
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/7.2.0/rti_routing_service.xsd" version="7.2.0">
+    <types>
+    </types>
+
+    <domain_participant_library name="Generic_Implement">
+      <domain_participant name="Generic_DeviceElement_dp" domain_ref="DefaultDomainLibrary::d_inter_device">
+		  <domain_participant_qos name="Implement" base_name="BuiltinQosLib::Generic.Security">
+			  <property>
+				  <value>
+					  <element>
+						  <name>dds.sec.auth.identity_ca</name>
+						  <value>file:../Security/cert/ca/IdentityCACert.pem</value>
+					  </element>
+					  <element>
+						  <name>dds.sec.auth.identity_certificate</name>
+						  <value>file:../Security/cert/identities/Implement/Implement.pem</value>
+					  </element>
+					  <element>
+						  <name>dds.sec.auth.private_key</name>
+						  <value>file:../Security/cert/identities/Implement/private/ImplementKey.pem</value>
+					  </element>
+					  <element>
+						  <name>dds.sec.access.permissions_ca</name>
+						  <value>file:../Security/cert/ca/PermissionsCACert.pem</value>
+					  </element>
+					  <element>
+						  <name>dds.sec.access.governance</name>
+						  <value>file:../Security/xml/signed/Signed_Governance.p7s</value>
+					  </element>
+					  <element>
+						  <name>dds.sec.access.permissions</name>
+						  <value>file:../Security/xml/signed/Signed_Permissions_implement.p7s</value>
+					  </element>
+					  <element>
+						  <name>com.rti.serv.secure.cryptography.max_receiver_specific_macs</name>
+						  <value>4</value>
+					  </element>
+				  </value>
+			  </property>
+		  </domain_participant_qos>
+
+		  <subscriber name="s_ddop_hierarchy">
+          <data_reader name="r_ddop_hierarchy" topic_ref="t_ddop_hierarchy">
+            <content_filter name="f_parent_device_element" kind="builtin.sql">
+              <expression>parent_ref.name = %0 AND parent_ref.element_id = %1</expression>
+              <expression_parameters>
+                <element>0</element>
+                <element>0</element>
+              </expression_parameters>
+            </content_filter>
+            <datareader_qos base_name="DefaultQoSLibrary::q_device_information">
+            </datareader_qos>
+          </data_reader>
+        </subscriber>
+        <publisher name="p_diagnostics">
+          <data_writer name="w_diagnostics" topic_ref="t_diagnostic">
+            <datawriter_qos base_name="DefaultQoSLibrary::q_logging_data">
+            </datawriter_qos>
+          </data_writer>
+        </publisher>
+        <publisher name="p_ddop_hierarchy">
+          <data_writer name="w_ddop_hierarchy" topic_ref="t_ddop_hierarchy">
+            <datawriter_qos base_name="DefaultQoSLibrary::q_device_information">
+            </datawriter_qos>
+          </data_writer>
+        </publisher>
+      </domain_participant>
+      <domain_participant name="Generic_ControlHandlingDeviceElement_dp" domain_ref="DefaultDomainLibrary::d_inter_device">
+        <publisher name="p_ddi_linking">
+          <data_writer name="w_ddi_linking" topic_ref="t_ddi_linking">
+            <datawriter_qos base_name="DefaultQoSLibrary::q_device_information">
+            </datawriter_qos>
+          </data_writer>
+        </publisher>
+        <publisher name="p_pd_values_best_effort">
+          <data_writer name="w_pd_values_best_effort" topic_ref="t_pd_values_best_effort"/>
+        </publisher>
+        <subscriber name="s_pd_values_best_effort">
+          <data_reader name="r_pd_values_best_effort" topic_ref="t_pd_values_best_effort">
+            <content_filter name="f_device_element" kind="builtin.sql">
+              <expression>element_ref.name = %0 AND element_ref.element_id = %1</expression>
+              <expression_parameters>
+                <element>0</element>
+                <element>0</element>
+              </expression_parameters>
+            </content_filter>
+          </data_reader>
+        </subscriber>
+        <subscriber name="s_ddop_hierarchy">
+          <data_reader name="r_ddop_hierarchy" topic_ref="t_ddop_hierarchy">
+            <content_filter name="f_parent_device_element" kind="builtin.sql">
+              <expression>parent_ref.name = %0 AND parent_ref.element_id = %1</expression>
+              <expression_parameters>
+                <element>0</element>
+                <element>0</element>
+              </expression_parameters>
+            </content_filter>
+            <datareader_qos base_name="DefaultQoSLibrary::q_device_information">
+            </datareader_qos>
+          </data_reader>
+        </subscriber>
+        <publisher name="p_diagnostics">
+          <data_writer name="w_diagnostics" topic_ref="t_diagnostic">
+            <datawriter_qos base_name="DefaultQoSLibrary::q_logging_data">
+            </datawriter_qos>
+          </data_writer>
+        </publisher>
+        <publisher name="p_ddop_hierarchy">
+          <data_writer name="w_ddop_hierarchy" topic_ref="t_ddop_hierarchy">
+            <datawriter_qos base_name="DefaultQoSLibrary::q_device_information">
+            </datawriter_qos>
+          </data_writer>
+        </publisher>
+      </domain_participant>
+    </domain_participant_library>
+</dds>

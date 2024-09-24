@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MIT License -->
+<!--  -->
+<!-- Copyright (c) 2024 Samuel Brodie, Timo Oksanen, Henri Hornburg, Daniel Ostermeier, Maksim Pavlov Technical University of Munich -->
+<!--  -->
+<!-- Permission is hereby granted, free of charge, to any person obtaining a copy -->
+<!-- of this software and associated documentation files (the "Software"), to deal -->
+<!-- in the Software without restriction, including without limitation the rights -->
+<!-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell -->
+<!-- copies of the Software, and to permit persons to whom the Software is -->
+<!-- furnished to do so, subject to the following conditions: -->
+<!--  -->
+<!-- The above copyright notice and this permission notice shall be included in all -->
+<!-- copies or substantial portions of the Software. -->
+<!--  -->
+<!-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR -->
+<!-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, -->
+<!-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE -->
+<!-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER -->
+<!-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, -->
+<!-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE -->
+<!-- SOFTWARE. -->
+
+
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/7.2.0/rti_routing_service.xsd" version="7.2.0">
+    <types>
+      <module name="Common" allowed_data_representation="xcdr2">
+        <struct name="Time" extensibility="appendable">
+          <member name="Hours_24" type="uint8" default="0" min="0" max="23"/>
+          <member name="Minutes" type="uint8" default="0" min="0" max="59"/>
+          <member name="Seconds" type="float64" min="0" max="60"/>
+        </struct>
+        <struct name="OnOff_t">
+          <member name="on" type="boolean"/>
+        </struct>
+        <enum name="Unit_e">
+          <enumerator name="m"/>
+          <enumerator name="m_2"/>
+          <enumerator name="m_3"/>
+          <enumerator name="kg"/>
+          <enumerator name="s"/>
+          <enumerator name="count"/>
+          <enumerator name="none"/>
+        </enum>
+        <struct name="Unit_t">
+          <member name="nominator" type="nonBasic" nonBasicTypeName="Common::Unit_e"/>
+          <member name="denominator" type="nonBasic" nonBasicTypeName="Common::Unit_e"/>
+        </struct>
+        <struct name="Date">
+          <member name="Year" type="int16" default="2000"/>
+          <member name="Month" type="uint8" default="1" min="1" max="12"/>
+          <member name="Day" type="uint8" default="1" min="1" max="31"/>
+        </struct>
+      </module>
+      <module name="DeviceInformation" allowed_data_representation="xcdr2">
+        <struct name="ElementReference_t">
+          <member name="name" type="uint64" key="true"/>
+          <member name="element_id" type="uint64" key="true"/>
+        </struct>
+        <struct name="Device_t">
+          <member name="id" type="string" stringMaxLength="100"/>
+          <member name="designator" type="string" stringMaxLength="100"/>
+          <member name="software_version" type="string" stringMaxLength="100"/>
+          <member name="name" type="string" stringMaxLength="100"/>
+          <member name="serial_number" type="string" stringMaxLength="100"/>
+          <member name="structure_label" type="string" stringMaxLength="100"/>
+          <member name="localization_label" type="string" stringMaxLength="100"/>
+        </struct>
+        <struct name="DeviceElement_t">
+          <member name="name" type="string" stringMaxLength="100"/>
+          <member name="element_ref" type="nonBasic" nonBasicTypeName="DeviceInformation::ElementReference_t" key="true"/>
+          <member name="parent_ref" type="nonBasic" nonBasicTypeName="DeviceInformation::ElementReference_t"/>
+        </struct>
+        <struct name="ServiceDiscovery_t" extensibility="appendable" autoid="hash">
+          <member name="NAME" type="uint64" key="true"/>
+          <member name="TC_client_version" type="uint8" optional="true"/>
+          <member name="TC_server_version" type="uint8" optional="true"/>
+          <member name="VT_client_version" type="uint8" optional="true"/>
+          <member name="VT_server_version" type="uint8" optional="true"/>
+        </struct>
+        <struct name="ServiceDiscovery_extended_t" baseType="DeviceInformation::ServiceDiscovery_t" autoid="hash">
+          <member name="hsi_conformity_certificate" type="int8" sequenceMaxLength="256" optional="true"/>
+        </struct>
+      </module>
+      <module name="Actuation" allowed_data_representation="xcdr2">
+        <enum name="HandlingFeature_e">
+          <enumerator name="minimum"/>
+          <enumerator name="maximum"/>
+          <enumerator name="actual"/>
+          <enumerator name="setpoint"/>
+          <enumerator name="iso_default"/>
+        </enum>
+        <enum name="HandlingGroup_e">
+          <enumerator name="tillage_depth"/>
+          <enumerator name="seeding_depth"/>
+          <enumerator name="application_rate"/>
+          <enumerator name="working_height"/>
+          <enumerator name="fill_level"/>
+          <enumerator name="flow_rate"/>
+        </enum>
+        <struct name="ControlHandlingCapabilities_t">
+          <member name="element_ref" type="nonBasic" nonBasicTypeName="DeviceInformation::ElementReference_t" key="true"/>
+          <member name="handling_group" type="nonBasic" nonBasicTypeName="Actuation::HandlingGroup_e" key="true"/>
+          <member name="option_nr" type="uint8" key="true"/>
+          <member name="unit" type="nonBasic" nonBasicTypeName="Common::Unit_t"/>
+        </struct>
+        <struct name="ControlHandlingValues_t">
+          <member name="element_ref" type="nonBasic" nonBasicTypeName="DeviceInformation::ElementReference_t" key="true"/>
+          <member name="handling_feature" type="nonBasic" nonBasicTypeName="Actuation::HandlingFeature_e" key="true"/>
+          <member name="handling_group" type="nonBasic" nonBasicTypeName="Actuation::HandlingGroup_e" key="true"/>
+          <member name="value" type="float64"/>
+          <member name="unit" type="nonBasic" nonBasicTypeName="Common::Unit_t"/>
+        </struct>
+      </module>
+      <module name="GNSS" allowed_data_representation="xcdr2">
+        <struct name="ReferenceStation">
+          <member name="Type" type="uint8"/>
+          <member name="ID" type="uint16"/>
+          <member name="AgeDGNSS" type="float32"/>
+        </struct>
+        <struct name="PositionData_t" extensibility="appendable">
+          <member name="NAME" type="uint64" key="true"/>
+          <member name="SID" type="uint8"/>
+          <member name="PositionDate" type="nonBasic" nonBasicTypeName="Common::Date" optional="true"/>
+          <member name="PositionTime" type="nonBasic" nonBasicTypeName="Common::Time" optional="true"/>
+          <member name="Lat" type="float64" optional="true"/>
+          <member name="Lon" type="float64" optional="true"/>
+          <member name="Alt" type="float64" optional="true"/>
+          <member name="TypeOfSystem" type="uint8" optional="true"/>
+          <member name="Method" type="uint8" optional="true"/>
+          <member name="Integrity" type="uint8" optional="true"/>
+          <member name="NumOfSVs" type="uint8" optional="true"/>
+          <member name="HDOP" type="float32" optional="true"/>
+          <member name="PDOP" type="float32" optional="true"/>
+          <member name="GeoidalSeparation" type="float32" optional="true"/>
+          <member name="ReferenceStation" type="nonBasic" nonBasicTypeName="GNSS::ReferenceStation" sequenceMaxLength="10" optional="true"/>
+        </struct>
+      </module>
+      <module name="Vehicle" allowed_data_representation="xcdr2">
+        <struct name="Engine">
+          <member name="RPM" type="uint16"/>
+          <member name="Fuel_Consumption_Rate" type="uint16"/>
+          <!--Exhaust Gas Temperature-->
+          <member name="EGT" type="uint16"/>
+          <member name="Engine_Coolant_Temperature" type="uint16"/>
+          <member name="Intake_Air_Temperature" type="uint16"/>
+          <member name="Throttle_Position" type="uint8" min="0" max="100"/>
+          <member name="Engine_Load" type="uint8" min="0" max="100"/>
+          <!--Mass Air Flow-->
+          <member name="MAF" type="uint8"/>
+          <member name="Fuel_System_Pressure" type="uint32"/>
+        </struct>
+        <enum name="Wheel">
+          <enumerator name="Front_Left"/>
+          <enumerator name="Front_Right"/>
+          <enumerator name="Rear_Left"/>
+          <enumerator name="Rear_Right"/>
+        </enum>
+        <struct name="Wheel_Speed">
+          <member name="Wheel" type="nonBasic" nonBasicTypeName="Vehicle::Wheel"/>
+          <member name="Speed" type="uint16"/>
+        </struct>
+        <struct name="Dynamics">
+          <member name="Speed" type="uint16"/>
+          <member name="Wheel_Speed" type="nonBasic" nonBasicTypeName="Vehicle::Wheel_Speed" sequenceMaxLength="4"/>
+          <member name="Acceleration" type="uint8"/>
+          <member name="Steering_Angle" type="uint16" min="0" max="360"/>
+        </struct>
+        <struct name="VehicleData_t">
+          <member name="ID" type="uint32"/>
+          <member name="Engine" type="nonBasic" nonBasicTypeName="Vehicle::Engine" optional="true"/>
+          <member name="Dynamics" type="nonBasic" nonBasicTypeName="Vehicle::Dynamics" optional="true"/>
+        </struct>
+      </module>
+      <module name="Diagnostics" allowed_data_representation="xcdr2">
+        <enum name="DiagnosticType_e">
+          <enumerator name="info"/>
+          <enumerator name="warning"/>
+          <enumerator name="error_recoverable"/>
+          <enumerator name="error_fatal"/>
+        </enum>
+        <enum name="DiagnosticCode_e">
+          <enumerator name="no_diagnostic_code"/>
+          <enumerator name="unit_mismatch"/>
+          <enumerator name="handling_group_mismatch"/>
+        </enum>
+        <struct name="Diagnostic_t">
+          <member name="element_ref" type="nonBasic" nonBasicTypeName="DeviceInformation::ElementReference_t"/>
+          <member name="diagnostic_code" type="nonBasic" nonBasicTypeName="Diagnostics::DiagnosticCode_e"/>
+          <member name="diagnostic_type" type="nonBasic" nonBasicTypeName="Diagnostics::DiagnosticType_e"/>
+          <member name="message" type="string" stringMaxLength="100"/>
+        </struct>
+      </module>
+    </types>
+
+    <qos_library name="DefaultQoSLibrary">
+      <qos_profile name="q_device_information">
+        <topic_qos>
+          <durability>
+            <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
+          </durability>
+          <liveliness>
+            <kind>AUTOMATIC_LIVELINESS_QOS</kind>
+            <lease_duration>
+              <sec>1</sec>
+            </lease_duration>
+          </liveliness>
+          <reliability>
+            <kind>RELIABLE_RELIABILITY_QOS</kind>
+          </reliability>
+          <history>
+            <kind>KEEP_LAST_HISTORY_QOS</kind>
+            <depth>1</depth>
+          </history>
+        </topic_qos>
+        <datareader_qos>
+          <durability>
+            <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
+          </durability>
+          <liveliness>
+            <kind>AUTOMATIC_LIVELINESS_QOS</kind>
+            <lease_duration>
+              <sec>1</sec>
+            </lease_duration>
+          </liveliness>
+          <reliability>
+            <kind>RELIABLE_RELIABILITY_QOS</kind>
+          </reliability>
+          <history>
+            <kind>KEEP_LAST_HISTORY_QOS</kind>
+            <depth>1</depth>
+          </history>
+        </datareader_qos>
+        <datawriter_qos>
+          <durability>
+            <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
+          </durability>
+          <liveliness>
+            <kind>AUTOMATIC_LIVELINESS_QOS</kind>
+            <lease_duration>
+              <sec>1</sec>
+            </lease_duration>
+          </liveliness>
+        </datawriter_qos>
+      </qos_profile>
+      <qos_profile name="q_logging_data">
+        <topic_qos>
+          <durability>
+            <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
+          </durability>
+          <reliability>
+            <kind>RELIABLE_RELIABILITY_QOS</kind>
+          </reliability>
+          <history>
+            <kind>KEEP_ALL_HISTORY_QOS</kind>
+          </history>
+        </topic_qos>
+        <datareader_qos>
+          <durability>
+            <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
+          </durability>
+          <reliability>
+            <kind>RELIABLE_RELIABILITY_QOS</kind>
+          </reliability>
+          <history>
+            <kind>KEEP_ALL_HISTORY_QOS</kind>
+          </history>
+        </datareader_qos>
+        <datawriter_qos>
+          <durability>
+            <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
+          </durability>
+          <history>
+            <kind>KEEP_ALL_HISTORY_QOS</kind>
+          </history>
+        </datawriter_qos>
+      </qos_profile>
+      <qos_profile name="q_gnss_vehicle">
+        <topic_qos>
+          <durability>
+            <kind>VOLATILE_DURABILITY_QOS</kind>
+          </durability>
+          <reliability>
+            <kind>BEST_EFFORT_RELIABILITY_QOS</kind>
+          </reliability>
+        </topic_qos>
+        <datareader_qos>
+          <durability>
+            <kind>VOLATILE_DURABILITY_QOS</kind>
+          </durability>
+          <reliability>
+            <kind>BEST_EFFORT_RELIABILITY_QOS</kind>
+          </reliability>
+        </datareader_qos>
+        <datawriter_qos>
+          <durability>
+            <kind>VOLATILE_DURABILITY_QOS</kind>
+          </durability>
+          <reliability>
+            <kind>BEST_EFFORT_RELIABILITY_QOS</kind>
+          </reliability>
+        </datawriter_qos>
+      </qos_profile>
+    </qos_library>
+    <domain_library name="DefaultDomainLibrary">
+      <domain name="d_inter_device" domain_id="0">
+        <register_type name="Device_t" type_ref="DeviceInformation::Device_t"/>
+        <register_type name="DeviceElement_t" type_ref="DeviceInformation::DeviceElement_t"/>
+        <register_type name="ControlHandlingCapabilities_t" type_ref="Actuation::ControlHandlingCapabilities_t"/>
+        <register_type name="ControlHandlingValues_t" type_ref="Actuation::ControlHandlingValues_t"/>
+        <register_type name="OnOff_t" type_ref="Common::OnOff_t"/>
+        <register_type name="Diagnostic_t" type_ref="Diagnostics::Diagnostic_t"/>
+        <register_type name="PositionData_t" type_ref="GNSS::PositionData_t"/>
+        <register_type name="VehicleData_t" type_ref="Vehicle::VehicleData_t"/>
+        <register_type name="ServiceDiscovery_t" type_ref="DeviceInformation::ServiceDiscovery_t"/>
+        <register_type name="ServiceDiscovery_extended_t" type_ref="DeviceInformation::ServiceDiscovery_extended_t"/>
+        <topic name="t_diagnostic" register_type_ref="Diagnostic_t">
+          <topic_qos base_name="DefaultQoSLibrary::q_logging_data">
+          </topic_qos>
+        </topic>
+        <topic name="t_device" register_type_ref="Device_t">
+          <topic_qos base_name="DefaultQoSLibrary::q_device_information">
+          </topic_qos>
+        </topic>
+        <topic name="t_ddop_hierarchy" register_type_ref="DeviceElement_t">
+          <topic_qos base_name="DefaultQoSLibrary::q_device_information">
+          </topic_qos>
+        </topic>
+        <topic name="t_ddi_linking" register_type_ref="ControlHandlingCapabilities_t">
+          <topic_qos base_name="DefaultQoSLibrary::q_device_information">
+          </topic_qos>
+        </topic>
+        <topic name="t_pd_values_reliable" register_type_ref="ControlHandlingValues_t">
+            <topic_qos base_name="DefaultQoSLibrary::q_device_information">
+          </topic_qos>
+        </topic>
+        <topic name="t_pd_values_best_effort" register_type_ref="ControlHandlingValues_t"/>
+        <topic name="t_key_switch_state" register_type_ref="OnOff_t"/>
+        <topic name="t_PositionData" register_type_ref="PositionData_t">
+          <topic_qos base_name="DefaultQoSLibrary::q_gnss_vehicle">
+          </topic_qos>
+        </topic>
+        <topic name="t_VehicleData" register_type_ref="VehicleData_t">
+          <topic_qos base_name="DefaultQoSLibrary::q_gnss_vehicle">
+          </topic_qos>
+        </topic>
+        <topic name="t_service_discovery" register_type_ref="ServiceDiscovery_t"/>
+      </domain>
+    </domain_library>
+</dds>
